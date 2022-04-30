@@ -9,6 +9,7 @@ import UIKit
 
 class SettingColorViewController: UIViewController {
     
+    //    MARK - IB Outlet
     @IBOutlet var colorView: UIView!
     
     @IBOutlet var redLabel: UILabel!
@@ -28,7 +29,7 @@ class SettingColorViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         colorView.backgroundColor = colorV
         colorView.layer.cornerRadius = 15
         
@@ -40,7 +41,8 @@ class SettingColorViewController: UIViewController {
         setValue(redTF, greenTF, blueTF)
         setValue(redLabel, greenLabel, blueLabel)
     }
-   
+    
+    // MARK - IB Action
     @IBAction func clauseView(_ sender: UIButton) {
         delegate.setColor(for: colorView.backgroundColor ?? .white)
         dismiss(animated: true)
@@ -62,7 +64,8 @@ class SettingColorViewController: UIViewController {
             blueTF.text = string(blueSlider)
         }
     }
-
+    
+    // MARK Private Func
     private func settingColorView() {
         let ciColor = CIColor(color: colorV)
         redSlider.value = Float(ciColor .red)
@@ -105,42 +108,45 @@ class SettingColorViewController: UIViewController {
     }
 }
 
+//MARK - RGB Values
 extension SettingColorViewController {
     private func string(_ slider: UISlider) -> String {
         String(format: "%.2f", slider.value)
     }
 }
 
+//MARK - Setting Text Field
 extension SettingColorViewController: UITextFieldDelegate {
-
-func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-            textField.resignFirstResponder()
-            return true
-        }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-   
-               guard let text = textField.text else { return }
-   
-               if let currentValue = Float(text) {
-   
-                   switch textField.tag {
-                   case 0:
-                       redSlider.value = currentValue
-                   case 1:
-                       greenSlider.value = currentValue
-                   default:
-                       blueSlider.value = currentValue
-                   }
-   
-                   settingColor()
-                   setValue(redLabel, greenLabel, blueLabel)
-               } else {
-                   showAlert(title: "Wrong format!", message: "Please enter correct value")
-               }
-           }
-       }
+        
+        guard let text = textField.text else { return }
+        
+        if let currentValue = Float(text) {
+            
+            switch textField.tag {
+            case 0:
+                redSlider.value = currentValue
+            case 1:
+                greenSlider.value = currentValue
+            default:
+                blueSlider.value = currentValue
+            }
+            
+            settingColor()
+            setValue(redLabel, greenLabel, blueLabel)
+        } else {
+            showAlert(title: "Wrong format!", message: "Please enter correct value")
+        }
+    }
+}
 
+//MARK - Show Alert
 extension SettingColorViewController {
     
     private func showAlert(title: String, message: String) {
@@ -151,39 +157,41 @@ extension SettingColorViewController {
     }
 }
 
+//MARK - Setting Keyboard Text Field
 extension SettingColorViewController {
-        private func settingToolbar() {
-            let toolbar = UIToolbar(
-                frame: CGRect(
-                    x: 0,
-                    y: 0,
-                    width: view.frame.size.width,
-                    height: 50
-                )
-            )
     
-            let flexibleSpase = UIBarButtonItem(
-                barButtonSystemItem: .fixedSpace,
-                target: self,
-                action: nil
+    private func settingToolbar() {
+        let toolbar = UIToolbar(
+            frame: CGRect(
+                x: 0,
+                y: 0,
+                width: view.frame.size.width,
+                height: 50
             )
-    
-            let doneButton = UIBarButtonItem(
-                title: "Done",
-                style: .done,
-                target: self,
-                action: #selector(didTabDone)
-            )
-    
-            toolbar.items = [flexibleSpase, doneButton]
-            toolbar.sizeToFit()
-            redTF.inputAccessoryView = toolbar
-            greenTF.inputAccessoryView = toolbar
-            blueTF.inputAccessoryView = toolbar
-        }
+        )
+        
+        let flexibleSpase = UIBarButtonItem(
+            barButtonSystemItem: .fixedSpace,
+            target: self,
+            action: nil
+        )
+        
+        let doneButton = UIBarButtonItem(
+            title: "Done",
+            style: .done,
+            target: self,
+            action: #selector(didTabDone)
+        )
+        
+        toolbar.items = [flexibleSpase, doneButton]
+        toolbar.sizeToFit()
+        redTF.inputAccessoryView = toolbar
+        greenTF.inputAccessoryView = toolbar
+        blueTF.inputAccessoryView = toolbar
+    }
     
     @objc private func didTabDone() {
-       
+        
         view.endEditing(true)
-           }
+    }
 }
