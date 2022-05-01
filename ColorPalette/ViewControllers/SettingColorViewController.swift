@@ -40,6 +40,11 @@ class SettingColorViewController: UIViewController {
         settingColorView()
         setValue(redTF, greenTF, blueTF)
         setValue(redLabel, greenLabel, blueLabel)
+        
+        redTF.delegate = self
+        greenTF.delegate = self
+        blueTF.delegate = self
+    
     }
     
     // MARK - IB Action
@@ -118,9 +123,9 @@ extension SettingColorViewController {
 //MARK - Setting Text Field
 extension SettingColorViewController: UITextFieldDelegate {
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        view.endEditing(true)
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
@@ -140,6 +145,8 @@ extension SettingColorViewController: UITextFieldDelegate {
             
             settingColor()
             setValue(redLabel, greenLabel, blueLabel)
+
+            
         } else {
             showAlert(title: "Wrong format!", message: "Please enter correct value")
         }
@@ -191,7 +198,6 @@ extension SettingColorViewController {
     }
     
     @objc private func didTabDone() {
-        
         view.endEditing(true)
     }
 }
