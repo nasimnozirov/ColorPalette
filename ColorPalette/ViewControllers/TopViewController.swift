@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol RenderingColorDelegate {
+protocol SettingColorViewControllerDelegate {
     func setColor(for colorView: UIColor)
 }
 
@@ -20,7 +20,7 @@ class TopViewController: UIViewController {
     }
 }
 // MARK - RenderingColorDeLegate
-extension TopViewController: RenderingColorDelegate {
+extension TopViewController: SettingColorViewControllerDelegate {
     func setColor(for colorView: UIColor) {
         view.backgroundColor = colorView
     }

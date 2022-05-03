@@ -24,8 +24,9 @@ class SettingColorViewController: UIViewController {
     @IBOutlet var greenTF: UITextField!
     @IBOutlet var blueTF: UITextField!
     
+    //MARK: - Public Properties
     var colorV: UIColor!
-    var delegate: RenderingColorDelegate!
+    var delegate: SettingColorViewControllerDelegate!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,48 +37,48 @@ class SettingColorViewController: UIViewController {
         redSlider.minimumTrackTintColor = .red
         greenSlider.minimumTrackTintColor = .green
         
-        settingToolbar()
-        settingColorView()
-        setValue(redTF, greenTF, blueTF)
-        setValue(redLabel, greenLabel, blueLabel)
+        setSliders()
+        setValue(for: redTF, greenTF, blueTF)
+        setValue(for: redLabel, greenLabel, blueLabel)
         
         redTF.delegate = self
         greenTF.delegate = self
         blueTF.delegate = self
-    
+        
     }
     
     // MARK - IB Action
-    @IBAction func clauseView(_ sender: UIButton) {
-        delegate.setColor(for: colorView.backgroundColor ?? .white)
+    @IBAction func clauseView() {
+        delegate?.setColor(for: colorView.backgroundColor ?? .white)
         dismiss(animated: true)
     }
     
     @IBAction func setColor(_ sender: UISlider) {
-        settingColor()
-        setValue(redLabel, greenLabel, blueLabel)
         
         switch sender{
         case redSlider:
-            redLabel.text = string(redSlider)
-            redTF.text = string(redSlider)
+            setValue(for: redLabel)
+            setValue(for: redTF)
         case greenSlider:
-            greenLabel.text = string(greenSlider)
-            greenTF.text = string(greenSlider)
+            setValue(for: greenLabel)
+            setValue(for: greenTF)
         default:
-            blueLabel.text = string(blueSlider)
-            blueTF.text = string(blueSlider)
+            setValue(for: blueLabel)
+            setValue(for: blueTF)
         }
+        
+        setColor()
     }
     
     // MARK Private Func
-    private func settingColorView() {
+    private func setSliders() {
         let ciColor = CIColor(color: colorV)
+        
         redSlider.value = Float(ciColor .red)
         greenSlider.value = Float(ciColor.green)
         blueSlider.value = Float(ciColor.blue)
     }
-    private func settingColor() {
+    private func setColor() {
         colorView.backgroundColor = UIColor(
             red: CGFloat(redSlider.value),
             green: CGFloat(greenSlider.value),
@@ -86,7 +87,7 @@ class SettingColorViewController: UIViewController {
         )
     }
     
-    private func setValue(_ labels: UILabel...) {
+    private func setValue(for labels: UILabel...) {
         labels.forEach { label in
             switch label {
             case redLabel:
@@ -99,7 +100,7 @@ class SettingColorViewController: UIViewController {
         }
     }
     
-    private func setValue(_ textFields: UITextField...) {
+    private func setValue(for textFields: UITextField...) {
         textFields.forEach { textField in
             switch textField {
             case redTF:
@@ -128,6 +129,7 @@ extension SettingColorViewController: UITextFieldDelegate {
         view.endEditing(true)
     }
     
+    //    мы тут берем переданные значение из текстфилд и передаём на слайдер и лейбл
     func textFieldDidEndEditing(_ textField: UITextField) {
         
         guard let text = textField.text else { return }
@@ -136,22 +138,23 @@ extension SettingColorViewController: UITextFieldDelegate {
             
             switch textField.tag {
             case 0:
-                redSlider.value = currentValue
+                redSlider.setValue(currentValue, animated: true)
+                setValue(for: redLabel)
             case 1:
-                greenSlider.value = currentValue
+                greenSlider.setValue(currentValue, animated: true)
+                setValue(for: redLabel)
             default:
-                blueSlider.value = currentValue
+                blueSlider.setValue(currentValue, animated: true)
+                setValue(for: redLabel)
             }
             
-            settingColor()
-            setValue(redLabel, greenLabel, blueLabel)
-
-            
-        } else {
-            showAlert(title: "Wrong format!", message: "Please enter correct value")
+            setColor()
+            return
         }
+        showAlert(title: "Wrong format!", message: "Please enter correct value")
     }
 }
+
 
 //MARK - Show Alert
 extension SettingColorViewController {
@@ -167,34 +170,25 @@ extension SettingColorViewController {
 //MARK - Setting Keyboard Text Field
 extension SettingColorViewController {
     
-    private func settingToolbar() {
-        let toolbar = UIToolbar(
-            frame: CGRect(
-                x: 0,
-                y: 0,
-                width: view.frame.size.width,
-                height: 50
-            )
-        )
-        
-        let flexibleSpase = UIBarButtonItem(
-            barButtonSystemItem: .fixedSpace,
-            target: self,
-            action: nil
-        )
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        textField.inputAccessoryView = toolbar
         
         let doneButton = UIBarButtonItem(
-            title: "Done",
-            style: .done,
+            barButtonSystemItem: .done,
             target: self,
             action: #selector(didTabDone)
         )
         
-        toolbar.items = [flexibleSpase, doneButton]
-        toolbar.sizeToFit()
-        redTF.inputAccessoryView = toolbar
-        greenTF.inputAccessoryView = toolbar
-        blueTF.inputAccessoryView = toolbar
+        let flexBarButton = UIBarButtonItem(
+            barButtonSystemItem: .flexibleSpace,
+            target: nil,
+            action: nil
+        )
+        
+        toolbar.items = [flexBarButton, doneButton]
+        
     }
     
     @objc private func didTabDone() {
